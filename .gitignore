@@ -9,3 +9,10 @@ env.fish
 
 # vs code files
 .vscode/
+
+# input files
+input.txt
+test.txt
+
+# output files
+output.txt

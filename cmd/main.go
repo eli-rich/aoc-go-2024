@@ -3,10 +3,55 @@ package main
 import (
 	"flag"
 	"fmt"
+	"time"
 
+	"github.com/eli-rich/aoc-go-2024/internal/days/day1"
 	"github.com/eli-rich/aoc-go-2024/internal/fetch"
 	"github.com/eli-rich/aoc-go-2024/internal/submit"
 )
+
+type daySolver interface {
+	Part1() (string, error)
+	Part2() (string, error)
+}
+
+var solvers = map[int]daySolver{
+	1: day1.Solver{},
+}
+
+func runDay(day, part int) {
+	solver, exists := solvers[day]
+	if !exists {
+		fmt.Printf("Solution for day %d not implemented yet\n", day)
+		return
+	}
+	if part == 0 || part == 1 {
+		start := time.Now()
+		answer, err := solver.Part1()
+		elapsed := time.Since(start)
+		if err != nil {
+			fmt.Printf("Part 1 error: %v\n", err)
+		} else {
+			fmt.Printf("Part 1: %s (took %s)\n", answer, elapsed)
+		}
+	}
+	if part == 0 || part == 2 {
+		start := time.Now()
+		answer, err := solver.Part2()
+		elapsed := time.Since(start)
+		if err != nil {
+			fmt.Printf("Part 2 error: %v\n", err)
+		} else {
+			fmt.Printf("Part 2: %s (took %s)\n", answer, elapsed)
+		}
+	}
+}
+
+func submitAnswer(day, part int, answer string) {
+	fmt.Printf("Submitting answer for day %d part %d: %s\n", day, part, answer)
+	result := submit.Answer(day, part, answer)
+	fmt.Println(result)
+}
 
 func main() {
 	fetchCmd := flag.Bool("fetch", false, "Fetch input for the day")
@@ -15,12 +60,6 @@ func main() {
 	day := flag.Int("day", 0, "Which day to run (1-25, 0 for all available)")
 	answer := flag.String("answer", "", "Answer to submit (used with -submit)")
 	flag.Parse()
-
-	// If no flags, print help:
-	if !*fetchCmd && !*submitCmd {
-		flag.Usage()
-		return
-	}
 
 	// Validate command line arguments
 	if *fetchCmd && *submitCmd {
@@ -45,6 +84,9 @@ func main() {
 
 	// Execute the appropriate command
 	if *fetchCmd {
+		if *day == 0 {
+			fmt.Println("Error: day must be specified when fetching")
+		}
 		if err := fetch.GetInput(*day); err != nil {
 			fmt.Printf("Error fetching input for day %d: %v\n", *day, err)
 			return
@@ -53,11 +95,25 @@ func main() {
 		return
 	}
 	if *submitCmd {
-		if err := submit.Answer(*day, *part, *answer); err != nil {
-			fmt.Printf("Error submitting answer for day %d part %d: %v\n", *day, *part, err)
+		if *day == 0 || *part == 0 {
+			fmt.Println("Error: day and part must be specified when submitting")
 			return
 		}
-		fmt.Printf("Submitted answer for day %d part %d\n", *day, *part)
+		submitAnswer(*day, *part, *answer)
 		return
+	}
+
+	// Run days
+	if *day == 0 {
+		// Run all available days
+		for d := range solvers {
+			fmt.Printf("--- Day %d ---\n", d)
+			runDay(d, *part)
+			fmt.Println()
+		}
+	} else {
+		// Run specific day
+		fmt.Printf("--- Day %d ---\n", *day)
+		runDay(*day, *part)
 	}
 }

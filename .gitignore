@@ -1,0 +1,11 @@
+# Binaries
+/bin/
+
+# Test binary
+*.test
+
+# Environment variables
+env.fish
+
+# vs code files
+.vscode/

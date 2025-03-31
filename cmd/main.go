@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/eli-rich/aoc-go-2024/internal/days/day1"
+	"github.com/eli-rich/aoc-go-2024/internal/days/day2"
 	"github.com/eli-rich/aoc-go-2024/internal/fetch"
 	"github.com/eli-rich/aoc-go-2024/internal/submit"
 )
@@ -17,6 +18,7 @@ type daySolver interface {
 
 var solvers = map[int]daySolver{
 	1: day1.Solver{},
+	2: day2.Solver{},
 }
 
 func runDay(day, part int) {
